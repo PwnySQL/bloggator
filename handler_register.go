@@ -27,7 +27,7 @@ func handlerRegister(s *state, cmd command) error {
 	}
 	err = s.cfg.SetUser(user.Name)
 
-	fmt.Printf("User %s was registered (at: %v, id: %v)", user.Name, user.CreatedAt, user.ID)
+	fmt.Printf("User %s was registered (at: %v, id: %v)\n", user.Name, user.CreatedAt, user.ID)
 
 	return err
 }

@@ -31,6 +31,7 @@ func main() {
 	cmds := commands{cmds: make(map[string]func(*state, command) error)}
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
+	cmds.register("reset", handlerReset)
 
 	cmd := command{name: os.Args[1], arguments: os.Args[2:]}
 	if err := cmds.run(&s, cmd); err != nil {

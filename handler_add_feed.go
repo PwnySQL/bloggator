@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/PwnySQL/bloggator/internal/database"
+	"github.com/PwnySQL/bloggator/internal/pgerror"
 )
 
 func handlerAddFeed(s *state, cmd command) error {
@@ -32,6 +33,9 @@ func handlerAddFeed(s *state, cmd command) error {
 		},
 	)
 	if err != nil {
+		if e := pgerror.UniqueViolation(err); e != nil {
+			err = fmt.Errorf("Feed with URL %s is already added", url)
+		}
 		return err
 	}
 	fmt.Printf("AddedFeed:\nName: %s\nURL: %s\nUser: %s (id: %v)\n", feed.Name, feed.Url, user.Name, feed.UserID)

@@ -11,16 +11,12 @@ import (
 	"github.com/PwnySQL/bloggator/internal/pgerror"
 )
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 2 {
 		return fmt.Errorf("%s expects the name and the url of the RSS Feed as argument", cmd.name)
 	}
 	name := cmd.arguments[0]
 	url := cmd.arguments[1]
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		return err
-	}
 	feed, err := s.db.CreateFeed(
 		context.Background(),
 		database.CreateFeedParams{

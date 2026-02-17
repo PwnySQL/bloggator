@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/PwnySQL/bloggator/internal/database"
 )
 
-func handlerFollowing(s *state, cmd command) error {
+func handlerFollowing(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 0 {
 		return fmt.Errorf("%s does not expect arguments", cmd.name)
 	}
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
 	follows, err := s.db.GetFollowsForUser(context.Background(), user.ID)
 	if err != nil {
 		return err
@@ -18,7 +19,7 @@ func handlerFollowing(s *state, cmd command) error {
 		fmt.Println("No follows available")
 	}
 
-	str := fmt.Sprintf("%s follows:\n", s.cfg.CurrentUserName)
+	str := fmt.Sprintf("%s follows:\n", user.Name)
 	for _, follow := range follows {
 		str += fmt.Sprintf("  * %s\n", follow.FeedName)
 		fmt.Println(str)

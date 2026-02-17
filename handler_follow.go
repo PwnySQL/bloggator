@@ -12,7 +12,7 @@ import (
 	"github.com/PwnySQL/bloggator/internal/pgerror"
 )
 
-func handlerFollow(s *state, cmd command) error {
+func handlerFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 1 {
 		return fmt.Errorf("%s expects an url as single argument", cmd.name)
 	}
@@ -21,10 +21,6 @@ func handlerFollow(s *state, cmd command) error {
 		if err == sql.ErrNoRows {
 			err = fmt.Errorf("%s is not a known feed URL. Please add it first using addfeed", cmd.arguments[0])
 		}
-		return err
-	}
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
 		return err
 	}
 	follow, err := s.db.CreateFeedFollow(context.Background(),

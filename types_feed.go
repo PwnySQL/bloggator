@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html"
+	"strings"
 )
 
 type RSSFeed struct {
@@ -30,9 +31,17 @@ func (r *RSSFeed) Unescape() {
 	}
 }
 
-func (r *RSSFeed) Print() {
-	fmt.Printf("Title: %s\nDescription: %s\nLink: %s\n", r.Channel.Title, r.Channel.Description, r.Channel.Link)
+func (r *RSSFeed) String() string {
+	var sb strings.Builder
+	sb.WriteString("##############################################################################################\n")
+	sb.WriteString(fmt.Sprintf("Title: %s\nDescription: %s\nLink: %s\n", r.Channel.Title, r.Channel.Description, r.Channel.Link))
 	for _, item := range r.Channel.Item {
-		fmt.Printf("Title: %s\nDescription: %s\nLink: %s\nPubDate: %s\n", item.Title, item.Description, item.Link, item.PubDate)
+		sb.WriteString(item.String())
 	}
+	sb.WriteString("##############################################################################################\n")
+	return sb.String()
+}
+
+func (i *RSSItem) String() string {
+	return fmt.Sprintf("\nTitle: %s - %s\nDescription: %s\nLink: %s\n", i.Title, i.PubDate, i.Description, i.Link)
 }

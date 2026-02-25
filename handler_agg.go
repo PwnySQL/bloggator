@@ -3,18 +3,20 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 )
 
 func handlerAgg(s *state, cmd command) error {
-	if len(cmd.arguments) > 0 {
-		return fmt.Errorf("%s does expect the RSS Feed url as argument", cmd.name)
+	if len(cmd.arguments) != 1 {
+		return fmt.Errorf("%s expects the time interval to fetch RSS feeds as argument", cmd.name)
 	}
-	url := "https://www.wagslane.dev/index.xml"
-	rssFeed, err := fetchFeed(context.Background(), url)
+	timeBetweenReqs, err := time.ParseDuration(cmd.arguments[0])
 	if err != nil {
 		return err
 	}
-	rssFeed.Unescape()
-	rssFeed.Print()
-	return nil
+	fmt.Printf("Collecting feeds every %v\n", timeBetweenReqs)
+	ticker := time.NewTicker(timeBetweenReqs)
+	for ; ; <-ticker.C {
+		scrapeFeeds(context.Background(), s)
+	}
 }

@@ -31,8 +31,10 @@ func (r *RSSFeed) Unescape() {
 }
 
 func (r *RSSFeed) Print() {
+	fmt.Println("##############################################################################################")
 	fmt.Printf("Title: %s\nDescription: %s\nLink: %s\n", r.Channel.Title, r.Channel.Description, r.Channel.Link)
 	for _, item := range r.Channel.Item {
-		fmt.Printf("Title: %s\nDescription: %s\nLink: %s\nPubDate: %s\n", item.Title, item.Description, item.Link, item.PubDate)
+		fmt.Printf("\nTitle: %s - %s\nDescription: %s\nLink: %s\n", item.Title, item.PubDate, item.Description, item.Link)
 	}
+	fmt.Println("##############################################################################################")
 }

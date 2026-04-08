@@ -30,6 +30,10 @@ func getSupportedTimeLayouts() []string {
 func scrapeFeeds(ctx context.Context, s *state) {
 	feed, err := s.db.GetNextFeedToFetch(ctx)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Printf("No feed to fetch yet. Add a feed with 'addfeed' first.")
+			return
+		}
 		log.Printf("Could not retrieve next feed to fetch: %v", err)
 		return
 	}

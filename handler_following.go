@@ -21,7 +21,7 @@ func handlerFollowing(s *state, cmd command, user database.User) error {
 
 	str := fmt.Sprintf("%s follows:\n", user.Name)
 	for _, follow := range follows {
-		str += fmt.Sprintf("  * %s\n", follow.FeedName)
+		str += fmt.Sprintf("  * %s (%s)\n", follow.FeedName, follow.FeedUrl)
 		fmt.Println(str)
 	}
 	return nil

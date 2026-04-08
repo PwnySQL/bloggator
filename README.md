@@ -1,6 +1,14 @@
 # bloggator
 Simple CLI tool to aggregate updates of RSS feeds, e.g. from blogs, in a SQL database
 
+## TODO
+1. Add pagination to browse command
+2. Add more filters (e.g. feeds) to browse command
+3. Remove HTML tags from title, description, ... using [bluemonday](https://github.com/microcosm-cc/bluemonday?tab=readme-ov-file)
+4. Add a service for the agg command to run it in the background and restarts it if it crashes
+5. Add search command with fuzzy searching through posts
+6. Add a TUI to read a post in the terminal
+
 ## Installation
 
 Make sure you have the latest [Go toolchain](https://golang.org/dl/) installed as well as a local Postgres database. You can then install `bloggator` with:

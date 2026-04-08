@@ -12,6 +12,21 @@ import (
 	"github.com/PwnySQL/bloggator/internal/pgerror"
 )
 
+func getSupportedTimeLayouts() []string {
+	return []string{
+		time.ANSIC,
+		time.UnixDate,
+		time.RubyDate,
+		time.RFC822,
+		time.RFC822Z,
+		time.RFC850,
+		time.RFC1123,
+		time.RFC1123Z,
+		time.RFC3339,
+		time.RFC3339Nano,
+	}
+}
+
 func scrapeFeeds(ctx context.Context, s *state) {
 	feed, err := s.db.GetNextFeedToFetch(ctx)
 	if err != nil {
@@ -30,19 +45,30 @@ func scrapeFeeds(ctx context.Context, s *state) {
 	}
 	log.Printf("Feed %s collected, %v posts found", feed.Name, len(rssFeed.Channel.Item))
 	rssFeed.Unescape()
+
+	// Assume a default layout to avoid layout staying nil.
+	// Assume that all items in a feed use the same time format.
+	layout := time.RFC3339
+	for _, layout_to_try := range getSupportedTimeLayouts() {
+		_, err = time.Parse(layout_to_try, rssFeed.Channel.Item[0].PubDate)
+		if err == nil {
+			layout = layout_to_try
+			break
+		}
+	}
 	for _, rssItem := range rssFeed.Channel.Item {
-		pubDate, err := time.Parse(time.RFC3339, rssItem.PubDate)
+		pubDate, err := time.Parse(layout, rssItem.PubDate)
 		if err != nil {
-			log.Printf("Could not parse pub date as RFC3339: %v", rssItem.PubDate, err)
+			log.Printf("Could not parse pub date using layout '%s': %v", layout, err)
 		}
 		_, err = s.db.CreatePost(ctx, database.CreatePostParams{
 			ID:          uuid.New(),
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
-			Title:       rssFeed.Channel.Title,
-			Url:         rssFeed.Channel.Link,
+			Title:       rssItem.Title,
+			Url:         rssItem.Link,
 			Description: sql.NullString{String: rssItem.Description, Valid: true},
-			PublishedAt: sql.NullTime{Time: pubDate, Valid: err != nil},
+			PublishedAt: sql.NullTime{Time: pubDate, Valid: err == nil},
 			FeedID:      feed.ID,
 		},
 		)
@@ -55,5 +81,6 @@ func scrapeFeeds(ctx context.Context, s *state) {
 			return
 		}
 	}
+	// log.Println(rssFeed.String())
 	return
 }
